@@ -1,0 +1,25 @@
+services:
+  weixin:
+    build:
+      context: .
+      args:
+        # Pin these for reproducible builds.
+        DSH_REF: master
+        BRIDGE_REF: master
+    image: dsh-weixin:latest
+    env_file:
+      - .env
+    environment:
+      # Inside the container the dsh home lives here; mount it to persist
+      # sessions, the peer→session map, and context tokens across restarts.
+      DSH_HOME: /opt/dsh-home
+      # Agent workspace. Mount a project directory here if the bot should
+      # operate on your codebase; otherwise it is a scratch dir.
+      WEIXIN_WORKSPACE: /workspace
+    volumes:
+      - dsh-home:/opt/dsh-home
+      - ./workspace:/workspace
+    restart: unless-stopped
+
+volumes:
+  dsh-home:
