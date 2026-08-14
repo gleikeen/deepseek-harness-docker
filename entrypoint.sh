@@ -1,14 +1,16 @@
 #!/bin/sh
 # deepseek-harness-docker entrypoint.
 #
-# Modes:
-#   (default)  run the WeChat bridge:  dsh --profile weixin
-#   setup      one-shot QR login:       dsh-wechat-setup
-#   web        run the Web UI instead:  dsh --profile web
+# Modes (first argument):
+#   (default)   run the WeChat bot:          dsh --profile weixin
+#   setup       one-shot QR login:           dsh-wechat-setup
+#   headless    one-shot CLI task:           dsh --profile headless <task...>
+#   web         run the Web UI (localhost):  dsh --profile web
+#   shell       drop into a shell            /bin/sh
 #
-# The `weixin` profile is baked into the image at /opt/dsh-home. On first boot
-# against a different/empty $DSH_HOME (e.g. a mounted volume), seed it so the
-# bot needs no network access at runtime.
+# The `weixin` profile is baked into the image at /opt/dsh-home-baked. On first
+# boot against an empty $DSH_HOME (a mounted volume), seed it so the bot needs
+# no network access at runtime.
 set -e
 
 seed_home() {
@@ -29,6 +31,15 @@ case "$cmd" in
   web)
     seed_home
     exec dsh --profile web "$@"
+    ;;
+  headless)
+    seed_home
+    shift
+    exec dsh --profile headless "$@"
+    ;;
+  shell|sh|bash)
+    seed_home
+    exec /bin/sh
     ;;
   weixin|run|bot|*)
     seed_home

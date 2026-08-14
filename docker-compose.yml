@@ -3,18 +3,17 @@ services:
     build:
       context: .
       args:
-        # Pin these for reproducible builds.
-        DSH_REF: master
+        # dsh 版本（npm 发布的 @deepseek-ai/dsh）。
+        DSH_VERSION: 0.1.0-rc.6
+        # 插件仓库的分支 / tag（shallow clone，需是分支或 tag 名）。
         BRIDGE_REF: master
     image: dsh-weixin:latest
     env_file:
       - .env
     environment:
-      # Inside the container the dsh home lives here; mount it to persist
-      # sessions, the peer→session map, and context tokens across restarts.
+      # 容器内 dsh 数据目录；挂载同名 volume 以持久化会话与微信映射。
       DSH_HOME: /opt/dsh-home
-      # Agent workspace. Mount a project directory here if the bot should
-      # operate on your codebase; otherwise it is a scratch dir.
+      # Agent 工作目录（容器内路径）；挂载你的项目目录即可让 bot 直接操作代码。
       WEIXIN_WORKSPACE: /workspace
     volumes:
       - dsh-home:/opt/dsh-home
